@@ -10,7 +10,7 @@ namespace PlayingWithDynamic
 {
   class DynamicClass : DynamicObject
   {
-    private Dictionary<string, object> _dictionary;
+    private Dictionary<string, object> _dictionary = new Dictionary<string, object>();
 
     public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
     {
@@ -30,18 +30,13 @@ namespace PlayingWithDynamic
 
     public override bool TrySetMember(SetMemberBinder binder, object value)
     {
-      if (_dictionary == null) _dictionary = new Dictionary<string, object>();
       _dictionary[binder.Name] = value;
       return true;
     }
 
     public override bool TryGetMember(GetMemberBinder binder, out object result)
     {
-      if (_dictionary == null) _dictionary = new Dictionary<string, object>();
-      if (_dictionary.ContainsKey(binder.Name))
-        result = _dictionary[binder.Name];
-      else
-        result = null;
+      _dictionary.TryGetValue(binder.Name, out result);
       return true;
     }
 
