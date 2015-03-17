@@ -10,6 +10,8 @@ namespace PlayingWithDynamic
 {
   class DynamicClass : DynamicObject
   {
+    private Dictionary<string, object> _dictionary;
+
     public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
     {
       var argList = new Dictionary<string, object>();
@@ -23,6 +25,23 @@ namespace PlayingWithDynamic
       PrintArgs(binder.Name, argList);
       
       result = null;
+      return true;
+    }
+
+    public override bool TrySetMember(SetMemberBinder binder, object value)
+    {
+      if (_dictionary == null) _dictionary = new Dictionary<string, object>();
+      _dictionary[binder.Name] = value;
+      return true;
+    }
+
+    public override bool TryGetMember(GetMemberBinder binder, out object result)
+    {
+      if (_dictionary == null) _dictionary = new Dictionary<string, object>();
+      if (_dictionary.ContainsKey(binder.Name))
+        result = _dictionary[binder.Name];
+      else
+        result = null;
       return true;
     }
 
@@ -42,6 +61,10 @@ namespace PlayingWithDynamic
     {
       dynamic obj = new DynamicClass();
       obj.MissingMethod(count: 12, value: "This is a string");
+
+      obj.NoProperty = true;
+      Console.WriteLine("NoProperty? {0}", obj.NoProperty);
+      Console.WriteLine("NotFound? {0}", obj.NotFound);
 
       Console.ReadKey();
     }
